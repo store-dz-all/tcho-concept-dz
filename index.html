@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fashion Store</title>
+<title>Luxury Fashion Store</title>
 
 <style>
 body{
     margin:0;
-    font-family: Arial;
-    background:#0a0f1c;
+    font-family:Arial;
+    background:#070b16;
     color:white;
 }
 
@@ -17,45 +17,48 @@ body{
 nav{
     display:flex;
     justify-content:space-between;
-    padding:15px 20px;
-    background:#111827;
+    padding:15px;
+    background:#0f172a;
     border-bottom:1px solid #1f2937;
 }
 
 nav h1{
     color:#facc15;
+    font-size:18px;
 }
 
 nav button{
     background:#3b82f6;
     border:none;
-    padding:8px 12px;
+    padding:8px 10px;
     color:white;
     border-radius:6px;
+    cursor:pointer;
+    margin-left:5px;
 }
 
 /* HERO */
 .hero{
     text-align:center;
-    padding:60px 20px;
-    background:linear-gradient(135deg,#111827,#0a0f1c);
+    padding:50px 20px;
+    background:linear-gradient(135deg,#111827,#070b16);
 }
 
 .hero h2{
-    font-size:34px;
+    font-size:30px;
 }
 
 /* PRODUCTS */
 .products{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:20px;
-    padding:20px;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:15px;
+    padding:15px;
 }
 
 .card{
     background:#111827;
-    border-radius:12px;
+    border-radius:10px;
     overflow:hidden;
     border:1px solid #1f2937;
     transition:0.3s;
@@ -67,51 +70,49 @@ nav button{
 
 .card img{
     width:100%;
-    height:220px;
+    height:200px;
     object-fit:cover;
 }
 
 .card h3{
-    margin:10px;
+    margin:8px;
 }
 
 .price{
-    margin:0 10px;
+    margin:0 8px;
     color:#22c55e;
-    font-weight:bold;
 }
 
 .card button{
     width:90%;
-    margin:10px;
+    margin:8px;
     padding:8px;
     border:none;
     background:#22c55e;
     color:white;
     border-radius:6px;
+    cursor:pointer;
 }
 
-/* ADMIN PANEL */
+/* ADMIN */
 .admin{
     position:fixed;
+    right:-320px;
     top:0;
-    right:-350px;
-    width:300px;
+    width:280px;
     height:100%;
     background:#0f172a;
     border-left:2px solid #1f2937;
-    padding:20px;
+    padding:15px;
     transition:0.3s;
 }
 
-.admin.active{
-    right:0;
-}
+.admin.active{right:0;}
 
 input{
     width:100%;
-    margin:5px 0;
     padding:8px;
+    margin:5px 0;
     border:none;
     border-radius:5px;
 }
@@ -124,11 +125,34 @@ input{
     width:100%;
     margin-top:10px;
     border-radius:6px;
+    cursor:pointer;
 }
 
 .close{
     background:red;
-    margin-top:10px;
+}
+
+/* CART */
+.cart{
+    position:fixed;
+    left:-320px;
+    top:0;
+    width:280px;
+    height:100%;
+    background:#111827;
+    border-right:2px solid #1f2937;
+    padding:15px;
+    transition:0.3s;
+    overflow:auto;
+}
+
+.cart.active{left:0;}
+
+.item{
+    background:#0f172a;
+    padding:8px;
+    margin:5px 0;
+    border-radius:6px;
 }
 </style>
 </head>
@@ -137,32 +161,42 @@ input{
 
 <nav>
     <h1>🔥 Fashion Store</h1>
-    <button onclick="toggleAdmin()">Admin Panel</button>
+    <div>
+        <button onclick="toggleCart()">Cart 🛒</button>
+        <button onclick="openAdmin()">Admin</button>
+    </div>
 </nav>
 
 <section class="hero">
     <h2>Luxury Clothing Store</h2>
-    <p>Modern fashion, premium style</p>
+    <p>Best fashion with premium style</p>
 </section>
 
 <section class="products" id="products"></section>
 
-<!-- ADMIN PANEL -->
+<!-- ADMIN -->
 <div class="admin" id="admin">
-    <h2>Admin Panel</h2>
+    <h3>Admin Panel</h3>
 
     <input id="name" placeholder="Product name">
     <input id="image" placeholder="Image URL">
     <input id="price" placeholder="Price">
 
     <button class="add" onclick="addProduct()">Add Product</button>
-    <button class="add close" onclick="toggleAdmin()">Close</button>
+    <button class="add close" onclick="openAdmin()">Close</button>
+</div>
+
+<!-- CART -->
+<div class="cart" id="cart">
+    <h3>🛒 Cart</h3>
+    <div id="cartItems"></div>
 </div>
 
 <script>
 let products = JSON.parse(localStorage.getItem("products")) || [];
+let cart = [];
 
-// show products
+/* RENDER PRODUCTS */
 function render(){
     let box = document.getElementById("products");
     box.innerHTML = "";
@@ -173,12 +207,12 @@ function render(){
             <img src="${p.image}">
             <h3>${p.name}</h3>
             <p class="price">$${p.price}</p>
-            <button onclick="buy(${i})">Buy Now 🛒</button>
+            <button onclick="buy(${i})">Buy Now</button>
         </div>;
     });
 }
 
-// add product
+/* ADD PRODUCT */
 function addProduct(){
     let name = document.getElementById("name").value;
     let image = document.getElementById("image").value;
@@ -195,14 +229,30 @@ function addProduct(){
     render();
 }
 
-// buy
+    /* BUY */
 function buy(i){
-    alert("🛒 Added: " + products[i].name);
+    cart.push(products[i]);
+    renderCart();
+    alert("Added to cart 🛒");
 }
 
-// admin toggle
-function toggleAdmin(){
+/* CART */
+function renderCart(){
+    let box = document.getElementById("cartItems");
+    box.innerHTML = "";
+
+    cart.forEach((c)=>{
+        box.innerHTML += <div class="item">${c.name} - $${c.price}</div>;
+    });
+}
+
+/* TOGGLE */
+function openAdmin(){
     document.getElementById("admin").classList.toggle("active");
+}
+
+function toggleCart(){
+    document.getElementById("cart").classList.toggle("active");
 }
 
 render();
