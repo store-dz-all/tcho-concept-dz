@@ -1,160 +1,195 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clothing Store</title>
+<title>TCHO-CONCEPT store</title>
 
 <style>
-body{
-    margin:0;
+body {
+    margin: 0;
     font-family: Arial;
-    background:#0b1220;
-    color:white;
+    background: #0b0f1a;
+    color: white;
 }
 
-header{
-    text-align:center;
-    padding:20px;
-    font-size:24px;
-    background:#111827;
+/* HEADER */
+header {
+    background: #0f172a;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1f2937;
 }
 
-.admin{
-    background:#111827;
-    margin:10px;
-    padding:10px;
-    border-radius:10px;
+header h1 {
+    font-size: 20px;
+    color: #facc15;
 }
 
-input{
-    width:100%;
-    padding:10px;
-    margin:5px 0;
-    border:none;
-    border-radius:5px;
-    background:#1f2937;
-    color:white;
+button {
+    cursor: pointer;
 }
 
-button{
-    width:100%;
-    padding:10px;
-    margin-top:5px;
-    border:none;
-    border-radius:5px;
-    cursor:pointer;
-    font-weight:bold;
+/* HERO */
+.hero {
+    text-align: center;
+    padding: 50px;
+    background: radial-gradient(circle,#111827,#0b0f1a);
 }
 
-.add{
-    background:green;
-    color:white;
+.hero h2 {
+    font-size: 32px;
 }
 
-.container{
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
+.hero p {
+    color: #94a3b8;
 }
 
-.card{
-    width:220px;
-    background:#111827;
-    margin:10px;
-    border-radius:10px;
-    overflow:hidden;
+/* PRODUCTS */
+.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+    gap: 20px;
+    padding: 20px;
 }
 
-.card img{
-    width:100%;
-    height:220px;
-    object-fit:cover;
+.card {
+    background: #111827;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: 0.3s;
+    border: 1px solid #1f2937;
 }
 
-.card h3{
-    margin:10px;
+.card:hover {
+    transform: scale(1.03);
 }
 
-.card p{
-    margin:10px;
-    color:#9ca3af;
+.card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
 }
 
-.buy{
-    background:#22c55e;
-    color:white;
-    margin:10px;
+.card h3 {
+    margin: 10px;
+}
+
+.price {
+    color: #22c55e;
+    margin: 0 10px;
+    font-weight: bold;
+}
+
+/* BUTTONS */
+.buy-btn {
+    width: 90%;
+    margin: 10px;
+    padding: 8px;
+    border: none;
+    background: #22c55e;
+    color: white;
+    border-radius: 6px;
+}
+
+.add-btn {
+    background: #3b82f6;
+    border: none;
+    padding: 10px;
+    color: white;
+    border-radius: 6px;
+}
+
+/* ADMIN */
+.admin {
+    background: #0f172a;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 10px;
+    border: 1px solid #1f2937;
+}
+
+input {
+    padding: 8px;
+    margin: 5px;
+    width: 200px;
+    border-radius: 5px;
+    border: none;
 }
 </style>
 </head>
 
 <body>
 
-<header>clothing dz</header>
+<header>
+    <h1>🔥 Luxury Store</h1>
+</header>
 
-<div class="admin">
-<h3>Admin Panel ➕</h3>
+<section class="hero">
+    <h2>Premium Fashion Store</h2>
+    <p>Buy the best clothes with style & luxury design</p>
+</section>
 
-<input id="name" placeholder="Product Name">
-<input id="price" placeholder="Price">
-<input id="img" placeholder="Image URL">
+<section class="container" id="products"></section>
 
-<button class="add" onclick="addProduct()">Add Product</button>
-</div>
+<section class="admin">
+    <h2>Admin Panel ➕ Add Product</h2><br>
 
-<div class="container" id="products"></div>
+    <input id="name" placeholder="Product name">
+    <input id="image" placeholder="Image URL">
+    <input id="price" placeholder="Price">
+
+    <button class="add-btn" onclick="addProduct()">Add Product</button>
+</section>
 
 <script>
+let products = JSON.parse(localStorage.getItem("products")) || [];
 
-let products = JSON.parse(localStorage.getItem("products")) || [
-    {name:"T-Shirt", price:"1500 DA", img:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab"},
-    {name:"Hoodie", price:"3500 DA", img:"https://images.unsplash.com/photo-1520975958225-3f61d6b0f5d0"}
-];
-
-function save(){
-    localStorage.setItem("products", JSON.stringify(products));
-}
-
-function render(){
+// render products
+function render() {
     let box = document.getElementById("products");
     box.innerHTML = "";
 
-    products.forEach(p=>{
+    products.forEach((p,i) => {
         box.innerHTML += 
         <div class="card">
-            <img src="${p.img}">
+            <img src="${p.image}">
             <h3>${p.name}</h3>
-            <p>${p.price}</p>
-            <button class="buy" onclick="order('${p.name}')">Buy on WhatsApp</button>
+            <p class="price">$${p.price}</p>
+            <button class="buy-btn" onclick="buy(${i})">Buy Now 🛒</button>
         </div>;
     });
 }
 
-function addProduct(){
-    let n = document.getElementById("name").value;
-    let p = document.getElementById("price").value;
-    let i = document.getElementById("img").value;
+// add product
+function addProduct() {
+    let name = document.getElementById("name").value;
+    let image = document.getElementById("image").value;
+    let price = document.getElementById("price").value;
 
-    if(n==""  p==""  i==""){
-        alert("Fill all fields!");
+    if(!name  !image  !price){
+        alert("Fill all fields");
         return;
     }
 
-    products.push({name:n, price:p, img:i});
-    save();
+    products.push({name,image,price});
+    localStorage.setItem("products", JSON.stringify(products));
+
+    document.getElementById("name").value = "";
+    document.getElementById("image").value = "";
+    document.getElementById("price").value = "";
+
     render();
 }
 
-function order(name){
-    let number = "213000000000";
-    let msg = "I want to order: " + name;
-    let url = "https://wa.me/" + number + "?text=" + encodeURIComponent(msg);
-    window.open(url, "_blank");
+// buy button
+function buy(i){
+    alert("🛒 Added to cart: " + products[i].name);
 }
 
 render();
-
 </script>
 
 </body>
